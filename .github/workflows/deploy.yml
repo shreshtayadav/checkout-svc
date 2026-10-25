@@ -1,4 +1,4 @@
-  name: deploy-checkout
+name: deploy-checkout
 run-name: ${{ inputs.label }}
 on:
   workflow_dispatch:
