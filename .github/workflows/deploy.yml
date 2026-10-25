@@ -1,0 +1,31 @@
+name: deploy-checkout
+run-name: ${{ inputs.label }}
+on:
+  workflow_dispatch:
+    inputs:
+      label:
+        description: "Run label"
+        default: "initial deploy"
+      force_fail:
+        description: "Force health check to fail (true/false)"
+        default: "false"
+jobs:
+  build-deploy:
+    runs-on: self-hosted
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build
+        run: mvn -B -DskipTests package
+      - name: Digest
+        run: sha256sum target/checkout-svc-2.3.1.jar | tee digest.txt
+      - uses: actions/upload-artifact@v4
+        with:
+          name: checkout-jar
+          path: |
+            target/checkout-svc-2.3.1.jar
+            digest.txt
+      - name: Deploy with Ansible
+        run: >
+          ansible-playbook -i ansible/inventory.ini ansible/deploy.yml
+          -e jar_path=$PWD/target/checkout-svc-2.3.1.jar
+          -e force_fail=${{ inputs.force_fail }}
