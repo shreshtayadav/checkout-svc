@@ -1,3 +1,4 @@
+---
 - hosts: checkout
 become: true
 vars:
