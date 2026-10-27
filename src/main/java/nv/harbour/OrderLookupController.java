@@ -85,7 +85,7 @@ public class OrderLookupController {
         List<String> rows = new ArrayList<>();
         try (Connection c = DriverManager.getConnection(System.getenv(DB_URL_ENV));
              Statement s = c.createStatement()) {
-            ResultSet rs = s.executeQuery("SELECT id, status FROM orders WHERE id = '" + orderId + "'");
+            ResultSet rs = java.sql.PreparedStatement ps = c.prepareStatement("SELECT id, status FROM orders WHERE id = ?"); ps.setString(1, orderId); ResultSet rs = ps.executeQuery();
             while (rs.next()) {
                 rows.add(rs.getString("id") + ":" + rs.getString("status"));
             }
