@@ -1,0 +1,19 @@
+name: code-scan
+on:
+  push:
+    branches: [main, 'feature/**']
+  workflow_dispatch:
+jobs:
+  scan:
+    runs-on: self-hosted
+    steps:
+      - uses: actions/checkout@v4
+        with: { fetch-depth: 0 }
+      - name: Build
+        run: mvn -B -DskipTests package
+      - name: SonarQube
+        run: |
+          sonar-scanner -Dsonar.projectKey=checkout-svc -Dsonar.sources=. \
+            -Dsonar.java.binaries=target/classes -Dsonar.exclusions=target/** \
+            -Dsonar.host.url=${{ secrets.SONAR_HOST_URL }} -Dsonar.token=${{ secrets.SONAR_TOKEN }} \
+            -Dsonar.branch.name=${{ github.ref_name }}
